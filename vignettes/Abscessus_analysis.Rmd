@@ -1,0 +1,73 @@
+---
+title: "Abscessus_analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Abscessus_analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Load packages and anonymised data, clean 
+
+```{r setup}
+#library(abscessus)
+librarian::shelf(survival, survminer)
+
+dat <- read.csv("../data/abscessus_data.csv")
+
+# Create more informative variables:
+dat$infected <- ifelse(test=dat$abscessuss_yes_1, yes="Infected", no="Not infected")
+dat$alive <- ifelse(test=dat$alive_yes_1, yes="Alive", no="Not alive")
+dat$lung.dysfun <- ifelse(test=dat$CLAD_yes_1, yes="Yes", no="No")
+dat$airway.injury <- ifelse(test=dat$airway_injury_yes_1, yes="Injury", no="No Injury")
+
+names(dat)[names(dat)=="survival_post_tx"] <- "time"
+dat$status <- -1*(dat$alive_yes_1-1)
+```
+
+## Difference in mortality
+### Binary
+Begin with 2x2 table:
+```{r, binary mortality}
+con <- table(dat$infected, dat$alive)
+con
+```
+
+Treating survival as binary: No difference between groups when using Fisher's Exact Test:
+
+```{r}
+fisher.test(con) 
+```
+
+### Survival analysis
+#### Plot
+```{r plot mortality, fig.height=4, fig.width=6}
+fit <- survfit(Surv(time, status) ~ infected, data = dat)
+ggsurvplot(fit, data=dat)
+```
+
+#### Log-rank test
+The log-rank test finds no difference in survival times between the two groups, and is the most appropriate model as it does not assume proportional hazards.
+```{r logrank}
+fit.diff <- survdiff(formula(fit), data=dat)
+fit.diff
+fit.diff$pvalue
+```
+#### Cox PH
+Fitting a Cox proportional hazards model also does not show an effect, though from the plot above, the assumption of proportional hazards appears to not hold.
+```{r coxPH}
+cox.no.covar <- coxph(Surv(time, status) ~ infected, data = dat)
+cox.no.covar
+```
+
+
+
+
+

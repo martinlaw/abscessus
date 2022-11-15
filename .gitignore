@@ -1,4 +1,5 @@
 .Rproj.user
-data/
 .Rhistory
 docs
+inst/doc
+scratch.R
