@@ -14,9 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-### Load packages and anonymised data, clean 
+### Load packages, load anonymised data, tidy data
 
-```{r setup}
+```{r setup, echo=T}
 library(librarian)
 librarian::shelf(survival, survminer,martinlaw/abscessus)
 
@@ -48,9 +48,30 @@ fisher.test(con)
 
 ### Survival analysis
 #### Plot
-```{r plot mortality, fig.height=4, fig.width=6}
+```{r plot mortality, fig.height=6, fig.width=8}
 fit <- survfit(Surv(time, status) ~ infected, data = dat)
-ggsurvplot(fit, data=dat)
+#ggsurvplot(fit, data=dat)
+saved_theme <- theme_minimal() + theme(axis.text = element_text(size = 10))
+logrank.plot <- ggsurvplot(
+   fit,                     # survfit object with calculated statistics.
+   data = dat,              # data used to fit survival curves. 
+   risk.table = TRUE,       # show risk table.
+   pval = TRUE,             # show p-value of log-rank test.
+   conf.int = FALSE,         # show confidence intervals for 
+                            # point estimates of survival curves.
+   #xlim = c(0,2000),        # present narrower X axis, but not affect
+                            # survival estimates.
+   #break.time.by = 500,     # break X axis in time intervals by 500.
+   ggtheme = saved_theme, # customize plot and risk table with a theme.
+ risk.table.y.text.col = T, # colour risk table text annotations.
+  risk.table.y.text = FALSE, # show bars instead of names in text annotations
+                            # in legend of risk table
+ title="Kaplan-Meier survival curves",
+)
+logrank.plot
+png(filename="../figs/logrank_plot.png", width=8, height=6, units="in", res=300)
+logrank.plot
+dev.off()
 ```
 
 #### Log-rank test
@@ -58,13 +79,60 @@ The log-rank test finds no difference in survival times between the two groups, 
 ```{r logrank}
 fit.diff <- survdiff(formula(fit), data=dat)
 fit.diff
+# P value:
 fit.diff$pvalue
+
+obs.exp.ratios <- fit.diff$obs/fit.diff$exp
+# Hazard ratio:
+obs.exp.ratios[1]/obs.exp.ratios[2]
+
+# Confidence interval
+obs.minus.exp <- fit.diff$obs[1]-fit.diff$exp[1]
+V <- fit.diff$var[1,1]
+# V <- obs.minus.exp^2 / fit.diff$chisq # equivalent calculation
+K <- obs.minus.exp/V
+log.lower <- K-1.96*sqrt(V)
+log.upper <- K+1.96*sqrt(V)
+ci <- exp(c(log.lower, log.upper))
+ci
 ```
 #### Cox PH
 Fitting a Cox proportional hazards model also does not show an effect, though from the plot above, the assumption of proportional hazards appears to not hold.
 ```{r coxPH}
 cox.no.covar <- coxph(Surv(time, status) ~ infected, data = dat)
 cox.no.covar
+```
+
+### Baseline characteristics
+Using Wilcoxon rank-sum test for continuous variables and Fisher's Exact Test for categorical variables (due to the small group size)
+```{r baseline chars}
+# Follow up:
+summary(dat$time)
+
+
+wilcox.test(formula = age_at_tx ~ infected, data=dat)
+tapply(dat$age_at_tx, dat$infected, summary)
+
+wilcox.test(formula = bmi_pre_tx ~ infected, data=dat)
+tapply(dat$bmi_pre_tx, dat$infected, summary)
+
+fisher.test(dat$infected, dat$gender_male_1)
+round(prop.table(table(dat$infected, dat$gender_male_1), margin=1), 2)
+
+fisher.test(dat$infected, dat$donortype)
+round(prop.table(table(dat$infected, dat$donortype), margin=1), 2)
+
+fisher.test(dat$infected, dat$organ_1_single)
+round(prop.table(table(dat$infected, dat$organ_1_single), margin=1), 2)
+
+fisher.test(dat$infected, dat$gord_yes_1)
+round(prop.table(table(dat$infected, dat$gord_yes_1), margin=1), 2)
+
+fisher.test(dat$infected, dat$immunosuppressed_pre_yes_1)
+round(prop.table(table(dat$infected, dat$immunosuppressed_pre_yes_1), margin=1), 2)
+
+fisher.test(dat$infected, dat$PGD_yes_1)
+round(prop.table(table(dat$infected, dat$PGD_yes_1), margin=1), 2)
 ```
 
 
