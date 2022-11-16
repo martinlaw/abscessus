@@ -70,18 +70,11 @@
     
     
 <div class="section level3">
-<h3 id="load-packages-and-anonymised-data-clean">Load packages and anonymised data, clean<a class="anchor" aria-label="anchor" href="#load-packages-and-anonymised-data-clean"></a>
+<h3 id="load-packages-load-anonymised-data-tidy-data">Load packages, load anonymised data, tidy data<a class="anchor" aria-label="anchor" href="#load-packages-load-anonymised-data-tidy-data"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DesiQuintans/librarian" class="external-link">librarian</a></span><span class="op">)</span></span>
 <span><span class="fu">librarian</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/librarian/man/shelf.html" class="external-link">shelf</a></span><span class="op">(</span><span class="va">survival</span>, <span class="va">survminer</span>,<span class="va">martinlaw</span><span class="op">/</span><span class="va">abscessus</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   These packages will be installed:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   'survminer'</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   It may take some time.</span></span>
-<span><span class="co">#&gt; also installing the dependencies 'crayon', 'diffobj', 'rematch2', 'pkgload', 'praise', 'waldo', 'testthat', 'numDeriv', 'SparseM', 'MatrixModels', 'minqa', 'nloptr', 'RcppEigen', 'carData', 'abind', 'pbkrtest', 'quantreg', 'lme4', 'commonmark', 'Rcpp', 'corrplot', 'car', 'colorspace', 'markdown', 'png', 'jpeg', 'gtable', 'isoband', 'ggrepel', 'ggsci', 'cowplot', 'ggsignif', 'polynom', 'rstatix', 'exactRankTests', 'mvtnorm', 'farver', 'labeling', 'munsell', 'RColorBrewer', 'viridisLite', 'backports', 'ellipsis', 'generics', 'tidyselect', 'KMsurv', 'data.table', 'zoo', 'km.ci', 'xtable', 'gridtext', 'ggplot2', 'ggpubr', 'gridExtra', 'maxstat', 'scales', 'broom', 'dplyr', 'tidyr', 'survMisc', 'ggtext'</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"../data/abscessus_data.csv"</span><span class="op">)</span></span>
 <span></span>
@@ -131,14 +124,38 @@
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">survfit</span><span class="op">(</span><span class="fu">Surv</span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">infected</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
-<span><span class="fu">ggsurvplot</span><span class="op">(</span><span class="va">fit</span>, data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Abscessus_analysis_files/figure-html/plot%20mortality-1.png" width="576"></p>
+<span><span class="co">#ggsurvplot(fit, data=dat)</span></span>
+<span><span class="va">saved_theme</span> <span class="op">&lt;-</span> <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">theme</span><span class="op">(</span>axis.text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">logrank.plot</span> <span class="op">&lt;-</span> <span class="fu">ggsurvplot</span><span class="op">(</span></span>
+<span>   <span class="va">fit</span>,                     <span class="co"># survfit object with calculated statistics.</span></span>
+<span>   data <span class="op">=</span> <span class="va">dat</span>,              <span class="co"># data used to fit survival curves. </span></span>
+<span>   risk.table <span class="op">=</span> <span class="cn">TRUE</span>,       <span class="co"># show risk table.</span></span>
+<span>   pval <span class="op">=</span> <span class="cn">TRUE</span>,             <span class="co"># show p-value of log-rank test.</span></span>
+<span>   conf.int <span class="op">=</span> <span class="cn">FALSE</span>,         <span class="co"># show confidence intervals for </span></span>
+<span>                            <span class="co"># point estimates of survival curves.</span></span>
+<span>   <span class="co">#xlim = c(0,2000),        # present narrower X axis, but not affect</span></span>
+<span>                            <span class="co"># survival estimates.</span></span>
+<span>   <span class="co">#break.time.by = 500,     # break X axis in time intervals by 500.</span></span>
+<span>   ggtheme <span class="op">=</span> <span class="va">saved_theme</span>, <span class="co"># customize plot and risk table with a theme.</span></span>
+<span> risk.table.y.text.col <span class="op">=</span> <span class="cn">T</span>, <span class="co"># colour risk table text annotations.</span></span>
+<span>  risk.table.y.text <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># show bars instead of names in text annotations</span></span>
+<span>                            <span class="co"># in legend of risk table</span></span>
+<span> title<span class="op">=</span><span class="st">"Kaplan-Meier survival curves"</span>,</span>
+<span><span class="op">)</span></span>
+<span><span class="va">logrank.plot</span></span></code></pre></div>
+<p><img src="Abscessus_analysis_files/figure-html/plot%20mortality-1.png" width="768"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span>filename<span class="op">=</span><span class="st">"../figs/logrank_plot.png"</span>, width<span class="op">=</span><span class="fl">8</span>, height<span class="op">=</span><span class="fl">6</span>, units<span class="op">=</span><span class="st">"in"</span>, res<span class="op">=</span><span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">logrank.plot</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; agg_png </span></span>
+<span><span class="co">#&gt;       2</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="log-rank-test">Log-rank test<a class="anchor" aria-label="anchor" href="#log-rank-test"></a>
 </h4>
 <p>The log-rank test finds no difference in survival times between the two groups, and is the most appropriate model as it does not assume proportional hazards.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit.diff</span> <span class="op">&lt;-</span> <span class="fu">survdiff</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
 <span><span class="va">fit.diff</span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -149,14 +166,31 @@
 <span><span class="co">#&gt; infected=Not infected 59       16    15.52    0.0150     0.109</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Chisq= 0.1  on 1 degrees of freedom, p= 0.7</span></span>
+<span><span class="co"># P value:</span></span>
 <span><span class="va">fit.diff</span><span class="op">$</span><span class="va">pvalue</span></span>
-<span><span class="co">#&gt; [1] 0.7415316</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.7415316</span></span>
+<span></span>
+<span><span class="va">obs.exp.ratios</span> <span class="op">&lt;-</span> <span class="va">fit.diff</span><span class="op">$</span><span class="va">obs</span><span class="op">/</span><span class="va">fit.diff</span><span class="op">$</span><span class="va">exp</span></span>
+<span><span class="co"># Hazard ratio:</span></span>
+<span><span class="va">obs.exp.ratios</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="va">obs.exp.ratios</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] 0.7814048</span></span>
+<span></span>
+<span><span class="co"># Confidence interval</span></span>
+<span><span class="va">obs.minus.exp</span> <span class="op">&lt;-</span> <span class="va">fit.diff</span><span class="op">$</span><span class="va">obs</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">-</span><span class="va">fit.diff</span><span class="op">$</span><span class="va">exp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">V</span> <span class="op">&lt;-</span> <span class="va">fit.diff</span><span class="op">$</span><span class="va">var</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span></span>
+<span><span class="co"># V &lt;- obs.minus.exp^2 / fit.diff$chisq # equivalent calculation</span></span>
+<span><span class="va">K</span> <span class="op">&lt;-</span> <span class="va">obs.minus.exp</span><span class="op">/</span><span class="va">V</span></span>
+<span><span class="va">log.lower</span> <span class="op">&lt;-</span> <span class="va">K</span><span class="op">-</span><span class="fl">1.96</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
+<span><span class="va">log.upper</span> <span class="op">&lt;-</span> <span class="va">K</span><span class="op">+</span><span class="fl">1.96</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
+<span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">log.lower</span>, <span class="va">log.upper</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ci</span></span>
+<span><span class="co">#&gt; [1]  0.04541889 14.02371866</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="cox-ph">Cox PH<a class="anchor" aria-label="anchor" href="#cox-ph"></a>
 </h4>
 <p>Fitting a Cox proportional hazards model also does not show an effect, though from the plot above, the assumption of proportional hazards appears to not hold.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cox.no.covar</span> <span class="op">&lt;-</span> <span class="fu">coxph</span><span class="op">(</span><span class="fu">Surv</span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">infected</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="va">cox.no.covar</span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -168,6 +202,157 @@
 <span><span class="co">#&gt; Likelihood ratio test=0.12  on 1 df, p=0.7341</span></span>
 <span><span class="co">#&gt; n= 68, number of events= 18</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level3">
+<h3 id="baseline-characteristics">Baseline characteristics<a class="anchor" aria-label="anchor" href="#baseline-characteristics"></a>
+</h3>
+<p>Using Wilcoxon rank-sum test for continuous variables and Fisher’s Exact Test for categorical variables (due to the small group size)</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Follow up:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;     1.0   508.2   741.0   725.0  1033.5  1225.0</span></span>
+<span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">age_at_tx</span> <span class="op">~</span> <span class="va">infected</span>, data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Wilcoxon rank sum test with continuity correction</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  age_at_tx by infected</span></span>
+<span><span class="co">#&gt; W = 277, p-value = 0.8421</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">age_at_tx</span>, <span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">summary</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $Infected</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   46.00   50.00   54.00   54.56   60.00   64.00 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Not infected`</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   20.00   46.00   56.00   52.69   60.00   68.00</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">bmi_pre_tx</span> <span class="op">~</span> <span class="va">infected</span>, data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Wilcoxon rank sum test with continuity correction</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  bmi_pre_tx by infected</span></span>
+<span><span class="co">#&gt; W = 262.5, p-value = 0.9639</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">bmi_pre_tx</span>, <span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">summary</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $Infected</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   20.00   22.30   23.50   24.38   24.40   35.20 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`Not infected`</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   16.70   21.35   23.70   23.96   26.95   32.00</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">gender_male_1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$gender_male_1</span></span>
+<span><span class="co">#&gt; p-value = 1</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.1329911 4.7844602</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;  0.9060624</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">gender_male_1</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   f    m</span></span>
+<span><span class="co">#&gt;   Infected     0.33 0.67</span></span>
+<span><span class="co">#&gt;   Not infected 0.36 0.64</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">donortype</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$donortype</span></span>
+<span><span class="co">#&gt; p-value = 0.6805</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.1146778 4.3746267</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;  0.6269587</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">donortype</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                 DBD  DCD</span></span>
+<span><span class="co">#&gt;   Infected     0.67 0.33</span></span>
+<span><span class="co">#&gt;   Not infected 0.76 0.24</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">organ_1_single</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$organ_1_single</span></span>
+<span><span class="co">#&gt; p-value = 0.6742</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.007758465 3.179263171</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;  0.3710222</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">organ_1_single</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   1    2</span></span>
+<span><span class="co">#&gt;   Infected     0.11 0.89</span></span>
+<span><span class="co">#&gt;   Not infected 0.25 0.75</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">gord_yes_1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$gord_yes_1</span></span>
+<span><span class="co">#&gt; p-value = 0.7266</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.2792571 9.9053215</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;    1.46251</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">gord_yes_1</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   0    1</span></span>
+<span><span class="co">#&gt;   Infected     0.67 0.33</span></span>
+<span><span class="co">#&gt;   Not infected 0.58 0.42</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">immunosuppressed_pre_yes_1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$immunosuppressed_pre_yes_1</span></span>
+<span><span class="co">#&gt; p-value = 0.1898</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.06273966 2.67446291</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;   0.366871</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">immunosuppressed_pre_yes_1</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   0    1</span></span>
+<span><span class="co">#&gt;   Infected     0.67 0.33</span></span>
+<span><span class="co">#&gt;   Not infected 0.85 0.15</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">PGD_yes_1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$PGD_yes_1</span></span>
+<span><span class="co">#&gt; p-value = 0.3361</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.3804105       Inf</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;        Inf</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">PGD_yes_1</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   0    1</span></span>
+<span><span class="co">#&gt;   Infected     1.00 0.00</span></span>
+<span><span class="co">#&gt;   Not infected 0.81 0.19</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
