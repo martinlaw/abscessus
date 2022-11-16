@@ -1,6 +1,7 @@
 #### Load packages and data ####
-librarian::shelf(readxl, survival, survminer)
-dat <- readxl::read_xlsx("data/NTM final dataset NR.xlsx")
+librarian::shelf(survival, survminer)
+dat <- read.csv("../data/abscessus_data.csv")
+
 
 #### Data manipulation/cleaning ####
 dat$infected <- ifelse(test=dat$abscessuss_yes_1, yes="Infected", no="Not infected")

@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ### Load packages and anonymised data, clean 
 
 ```{r setup}
-#library(abscessus)
+library(abscessus)
 librarian::shelf(survival, survminer)
 
 dat <- read.csv("../data/abscessus_data.csv")
