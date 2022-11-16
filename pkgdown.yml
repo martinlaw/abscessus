@@ -1,0 +1,10 @@
+pandoc: 2.7.3
+pkgdown: 2.0.6
+pkgdown_sha: ~
+articles:
+  Abscessus_analysis: Abscessus_analysis.html
+last_built: 2022-11-16T12:44Z
+urls:
+  reference: https://martinlaw.github.io/abscessus/reference
+  article: https://martinlaw.github.io/abscessus/articles
+
