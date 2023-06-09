@@ -14,6 +14,21 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Background
+ 
+This is a study comparing the mortality of transplant patients: those who were infected with Mycobacterium abscessus vs those who were not infected. To me, this suggests a retrospective cohort study: Patients were either exposed or unexposed (to the infection), then either did or did not experience a binary outcome (death). The resulting 2x2 table includes a cell containing only 2 patients, so I used Fisher's exact test. I hadn't realised that I would be given survival time as part of the data. I became concerned that I was throwing information away, so I then did some standard survival analysis, including a log rank test due to uncertainty over the PH assumption. This seemed sensible to me.
+
+The paper has been reviewed and the decision is that the statisticial analysis is _flawed_! There is immortal time bias, because the exposure (infection) covariate is time-varying and not fixed. Any revision will be _rejected_ unless a landmark analysis is implemented. I accept this criticism, though I also would defend my original analysis using Fisher's exact test, as I think this is not biased. 
+
+I have never done a landmark analysis (thanks for your survival analysis book, Dom!). My understanding is that to do a landmark analysis, I need to choose a cut-off point. At this cut-off point, (1) all data before the cut-off is discarded, and (2) each patients' infection status is not allowed to change. That is, any patient that is uninfected at the cut-off point must be treated as uninfected in the analysis, regardless of what happens to them.
+
+There are only 9 (nine) patients in the infected group. With this in mind, I think the most sensible cut-off point would be the day X after transplant, where X equals the smallest day number that would put all 9 infected patients in the infected group. I would like to hear an opinion on this. I cannot do this analysis at the moment as I don't have this data; I only have death and post-transplant survival/censoring time. I think I only need "number of days from transplant to infection" for the 9 patients to learn X. I would then discard all patients who died before day X, and use a new survival variable, "survival/censoring time from day X".
+
+I don't want the paper to be rejected for bad stats(!), so I would really appreciate an opinion on this before I go ahead.
+
+
+## Analysis (as submitted)
+
 ### Load packages, load anonymised data, tidy data
 
 ```{r setup, echo=T}
@@ -110,35 +125,58 @@ ci <- exp(c(recip.coef-1.96*se, recip.coef+1.96*se))
 ci
 ```
 
-### Baseline characteristics
+### Descriptive statistics
 Using Wilcoxon rank-sum test for continuous variables and Fisher's Exact Test for categorical variables (due to the small group size)
-```{r baseline chars}
+
+#### Survival/censoring time, age at transplant
+```{r descriptive stats}
 # Follow up:
 summary(dat$time)
 
-
 wilcox.test(formula = age_at_tx ~ infected, data=dat)
 tapply(dat$age_at_tx, dat$infected, summary)
+```
 
+#### BMI pre-transplant
+```{r bmi}
 wilcox.test(formula = bmi_pre_tx ~ infected, data=dat)
 tapply(dat$bmi_pre_tx, dat$infected, summary)
+```
 
+#### Sex
+```{r sex}
 fisher.test(dat$infected, dat$gender_male_1)
 round(prop.table(table(dat$infected, dat$gender_male_1), margin=1), 2)
+```
 
+#### Donor type
+```{r donor}
 fisher.test(dat$infected, dat$donortype)
 round(prop.table(table(dat$infected, dat$donortype), margin=1), 2)
+```
 
+#### Organ infected
+```{r organ}
 fisher.test(dat$infected, dat$organ_1_single)
 round(prop.table(table(dat$infected, dat$organ_1_single), margin=1), 2)
+```
 
+#### GORD
+```{r GORD}
 fisher.test(dat$infected, dat$gord_yes_1)
 round(prop.table(table(dat$infected, dat$gord_yes_1), margin=1), 2)
+```
 
+#### Immunosuppressed
+```{r immuno}
 fisher.test(dat$infected, dat$immunosuppressed_pre_yes_1)
 round(prop.table(table(dat$infected, dat$immunosuppressed_pre_yes_1), margin=1), 2)
+```
 
+#### PGD
+```{r pgd}
 fisher.test(dat$infected, dat$PGD_yes_1)
+# Note infinite OR due to zero cell.
 round(prop.table(table(dat$infected, dat$PGD_yes_1), margin=1), 2)
 
 fisher.test(dat$infected, dat$CLAD_yes_1)
