@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=T}
 library(librarian)
-librarian::shelf(survival, survminer,martinlaw/abscessus)
+librarian::shelf(survival, survminer,martinlaw/abscessus, ggplot2)
 
 dat <- read.csv("../data/abscessus_data.csv")
 
@@ -66,7 +66,7 @@ logrank.plot <- ggsurvplot(
  risk.table.y.text.col = T, # colour risk table text annotations.
   risk.table.y.text = FALSE, # show bars instead of names in text annotations
                             # in legend of risk table
- title="Kaplan-Meier survival curves",
+ title="Figure 1: Kaplan-Meier survival curves",
 )
 logrank.plot
 png(filename="../figs/logrank_plot.png", width=8, height=6, units="in", res=300)
@@ -86,21 +86,28 @@ obs.exp.ratios <- fit.diff$obs/fit.diff$exp
 # Hazard ratio:
 obs.exp.ratios[1]/obs.exp.ratios[2]
 
-# Confidence interval
-obs.minus.exp <- fit.diff$obs[1]-fit.diff$exp[1]
-V <- fit.diff$var[1,1]
-# V <- obs.minus.exp^2 / fit.diff$chisq # equivalent calculation
-K <- obs.minus.exp/V
-log.lower <- K-1.96*sqrt(V)
-log.upper <- K+1.96*sqrt(V)
-ci <- exp(c(log.lower, log.upper))
-ci
+# Confidence interval (not valid for log-rank, according to Bland and Altman)
+# obs.minus.exp <- fit.diff$obs[1]-fit.diff$exp[1]
+# V <- fit.diff$var[1,1]
+# # V <- obs.minus.exp^2 / fit.diff$chisq # equivalent calculation
+# K <- obs.minus.exp/V
+# log.lower <- K-1.96*sqrt(V)
+# log.upper <- K+1.96*sqrt(V)
+# ci <- exp(c(log.lower, log.upper))
+# ci
 ```
 #### Cox PH
 Fitting a Cox proportional hazards model also does not show an effect, though from the plot above, the assumption of proportional hazards appears to not hold.
 ```{r coxPH}
 cox.no.covar <- coxph(Surv(time, status) ~ infected, data = dat)
-cox.no.covar
+# Test PH assumption:
+cox.zph(cox.no.covar)
+plot(cox.zph(cox.no.covar))
+summary(cox.no.covar)
+recip.coef <- -summary(cox.no.covar)$coef[1]
+se <- summary(cox.no.covar)$coef[3]
+ci <- exp(c(recip.coef-1.96*se, recip.coef+1.96*se))
+ci
 ```
 
 ### Baseline characteristics
@@ -133,8 +140,38 @@ round(prop.table(table(dat$infected, dat$immunosuppressed_pre_yes_1), margin=1),
 
 fisher.test(dat$infected, dat$PGD_yes_1)
 round(prop.table(table(dat$infected, dat$PGD_yes_1), margin=1), 2)
-```
 
+fisher.test(dat$infected, dat$CLAD_yes_1)
+round(prop.table(table(dat$infected, dat$CLAD_yes_1), margin=1), 2)
+```
+```{r, echo=FALSE, eval=FALSE}
+### Proportional Hazards: testing
+m <- nrow(dat) # total sample size
+n <- sum(dat$infected=="Infected")
+# compute schoenfeld residuals
+
+coxfit <- coxph(Surv(time, status) ~ z, data = dat, method = "breslow", robust = T)
+sresid <- resid(coxfit, type = "schoenfeld")
+
+# compute KM estimate
+sfit <- survfit(Surv(start,stop,event) ~ 1, data = ccdat)
+
+sest <- sfit$surv[sfit$n.event > 0]
+
+ecnt <- sfit$n.event[sfit$n.event > 0]
+
+km <- rep(sest^(m/n), ecnt)
+
+# correlation test with event time
+
+cor.test(sort(dat$stop[dat$event==1]),sresid,method = "pearson")
+
+# correlation test with rank order of event time cor.test(rank(sort(ccdat$stop[ccdat$event==1])),sresid,method = "pearson”)
+
+# correlation test with KM estimates
+
+cor.test(km,sresid,method = "pearson")$p.value
+```
 
 
 
