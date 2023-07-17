@@ -1,15 +1,14 @@
 #### Load packages and data ####
-librarian::shelf(survival, survminer,here)
-dat <- read.csv("data/abscessus_data.csv")
+librarian::shelf(survival, survminer, here)
+dat <- read.csv(paste0(here::here(), "/data/abscessus_data.csv"))
 
 
 #### Data manipulation/cleaning ####
 dat$infected <- ifelse(test=dat$abscessuss_yes_1, yes="Infected", no="Not infected")
+dat$infected <- factor(dat$infected, levels = c("Not infected", "Infected"))
 dat$alive <- ifelse(test=dat$alive_yes_1, yes="Alive", no="Not alive")
 dat$lung.dysfun <- ifelse(test=dat$CLAD_yes_1, yes="Yes", no="No")
 dat$airway.injury <- ifelse(test=dat$airway_injury_yes_1, yes="Injury", no="No Injury")
-
-
 names(dat)[names(dat)=="survival_post_tx"] <- "time"
 dat$status <- -1*(dat$alive_yes_1-1)
 
@@ -61,5 +60,26 @@ con.airway <- table(dat$infected, dat$airway.injury)
 addmargins(con.airway)
 fisher.test(con.airway) # No difference between the groups
 
+######### Time dependent covariate analysis ####
 
+# Create columns tstart, tstop for time dependent covariate analysis:
+temp.data <- tmerge(data1=dat,
+                    data2=dat,
+                    id=X,
+                    death=event(time, status),
+                    infect.var=tdc(infect.day))
+dat.tdc <- temp.data[, c("X", "tstart", "tstop", "death", "infect.var")]
+
+tdc.analysis <- coxph(Surv(tstart, tstop, death) ~ infect.var, data = dat.tdc)
+summary(tdc.analysis)
+
+
+####### Landmark analysis (for interest) #######
+max(dat$infect.day, na.rm = T)
+# Choose landmark as day 114, as this is the earliest day that will maximise
+# the size of the small (n=9) infection group:
+index.114d <- dat$time >= 114
+dat$infected.114 <- dat$infected=="Infected" & dat$infect.day < 114
+landmark <- coxph(Surv(time, status) ~ infected.114, data = dat, subset=index.114d)
+summary(landmark)
 
