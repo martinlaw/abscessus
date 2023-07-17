@@ -1,6 +1,6 @@
 #### Load packages and data ####
-librarian::shelf(survival, survminer,here)
-dat <- read.csv("abscessus_data.csv")
+librarian::shelf(survival, survminer,here, survival)
+dat <- read.csv("../abscessus/data/abscessus_data.csv")
 
 
 #### Data manipulation/cleaning ####
@@ -61,5 +61,51 @@ con.airway <- table(dat$infected, dat$airway.injury)
 addmargins(con.airway)
 fisher.test(con.airway) # No difference between the groups
 
+######### Time dependent covariate analysis ####
+
+# Create columns tstart, tstop for time dependent covariate analysis:
+temp.data <- tmerge(data1=dat, data2=dat, id=X,
+                death=event(time, status),
+                infect.var=tdc(infect.day))
+dat.tdc <- temp.data[, c("X", "tstart", "tstop", "death", "infected", "lung.dysfun")]
+tdc.analysis <- coxph(Surv(tstart, tstop, death) ~ infected, data = dat.tdc)
+#coxph(Surv(tstart, tstop, death) ~ infected + lung.dysfun, data = dat.tdc)
+summary(tdc.analysis)
+summary(cox.no.covar)
 
 
+########## Example: From Moore et al #######
+result.heart <- coxph(Surv(futime, fustat) ~ transplant + age + surgery, data=jasa)
+summary(result.heart)
+
+tdata <- jasa[, -c(1:4, 11:14)]
+tdata$futime <- pmax(.5, tdata$futime)
+indx <- {{tdata$wait.time == tdata$futime} & !is.na(tdata$wait.time)}
+tdata$wait.time[indx] <- tdata$wait.time[indx] - .5
+tdata$id <- 1:nrow(tdata)
+sdata <- tmerge(tdata, tdata, id=id,
+                   death = event(futime, fustat),
+                   trans = tdc(wait.time))
+jasa.counting <- sdata[,c(7:11, 2:3)]
+
+
+cbind(sdata$fustat, sdata$death)
+
+
+summary(coxph(Surv(tstart, tstop, death) ~ trans + surgery + age, data=jasa.counting))
+head(jasa.counting)
+
+
+
+
+####### Landmark analysis (for interest) #######
+max(dat$infect.day, na.rm = T)
+# Choose landmark as day 114, as this is the earliest day that will maximise
+# the size of the small (n=9) infection group:
+index.114d <- dat$time >= 114
+dat$infected.114 <- dat$infected=="Infected" & dat$infect.day < 114
+landmark <- coxph(Surv(time, status) ~ infected.114, data = dat, subset=index.114d)
+summary(landmark)
+
+dat$infect.day[66]
+dat[66,]
