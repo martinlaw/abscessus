@@ -83,7 +83,7 @@ test. I hadn’t realised that I would be given survival time as part of
 the data. I became concerned that I was throwing information away, so I
 then did some standard survival analysis, including a log rank test due
 to uncertainty over the PH assumption. This seemed sensible to me.</p>
-<p>The paper has been reviewed and the decision is that the statisticial
+<p>The paper has been reviewed and the decision is that the statistical
 analysis is <em>flawed</em>! There is immortal time bias, because the
 exposure (infection) covariate is time-varying and not fixed. Any
 revision will be <em>rejected</em> unless a landmark analysis is
@@ -114,15 +114,15 @@ really appreciate an opinion on this before I go ahead.</p>
 <h2 id="analysis-as-submitted">Analysis (as submitted)<a class="anchor" aria-label="anchor" href="#analysis-as-submitted"></a>
 </h2>
 <div class="section level3">
-<h3 id="load-packages-load-anonymised-data-tidy-data">Load packages, load anonymised data, tidy data<a class="anchor" aria-label="anchor" href="#load-packages-load-anonymised-data-tidy-data"></a>
+<h3 id="load-packages-load-anonymised-data-clean-the-data">Load packages, load anonymised data, clean the data<a class="anchor" aria-label="anchor" href="#load-packages-load-anonymised-data-clean-the-data"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DesiQuintans/librarian" class="external-link">librarian</a></span><span class="op">)</span></span>
-<span><span class="fu">librarian</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/librarian/man/shelf.html" class="external-link">shelf</a></span><span class="op">(</span><span class="va">survival</span>, <span class="va">survminer</span>,<span class="va">martinlaw</span><span class="op">/</span><span class="va">abscessus</span>, <span class="va">ggplot2</span><span class="op">)</span></span>
+<span><span class="fu">librarian</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/librarian/man/shelf.html" class="external-link">shelf</a></span><span class="op">(</span><span class="va">survival</span>, <span class="va">survminer</span>,<span class="va">martinlaw</span><span class="op">/</span><span class="va">abscessus</span>, <span class="va">ggplot2</span>, quiet<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"../data/abscessus_data.csv"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create more informative variables:</span></span>
+<span><span class="co"># Create more informative variable names:</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span>test<span class="op">=</span><span class="va">dat</span><span class="op">$</span><span class="va">abscessuss_yes_1</span>, yes<span class="op">=</span><span class="st">"Infected"</span>, no<span class="op">=</span><span class="st">"Not infected"</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">alive</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span>test<span class="op">=</span><span class="va">dat</span><span class="op">$</span><span class="va">alive_yes_1</span>, yes<span class="op">=</span><span class="st">"Alive"</span>, no<span class="op">=</span><span class="st">"Not alive"</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">lung.dysfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span>test<span class="op">=</span><span class="va">dat</span><span class="op">$</span><span class="va">CLAD_yes_1</span>, yes<span class="op">=</span><span class="st">"Yes"</span>, no<span class="op">=</span><span class="st">"No"</span><span class="op">)</span></span>
