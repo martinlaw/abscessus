@@ -1,6 +1,6 @@
 #### Load packages and data ####
 librarian::shelf(survival, survminer,here)
-dat <- read.csv("abscessus_data.csv")
+dat <- read.csv("data/abscessus_data.csv")
 
 
 #### Data manipulation/cleaning ####
