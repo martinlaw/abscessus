@@ -1,5 +1,5 @@
 #### Load packages and data ####
-librarian::shelf(survival, survminer, here)
+librarian::shelf(survival, survminer, here, gtsummary)
 dat <- read.csv(paste0(here::here(), "/data/abscessus_data.csv"))
 
 
@@ -72,6 +72,8 @@ dat.tdc <- temp.data[, c("X", "tstart", "tstop", "death", "infect.var")]
 
 tdc.analysis <- coxph(Surv(tstart, tstop, death) ~ infect.var, data = dat.tdc)
 summary(tdc.analysis)
+
+tbl_regression(x = tdc.analysis, exponentiate = T)
 
 
 ####### Landmark analysis (for interest) #######
