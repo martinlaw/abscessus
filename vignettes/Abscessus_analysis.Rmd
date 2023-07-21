@@ -65,7 +65,7 @@ fisher.test(con)
 ### Survival analysis
 #### Plot
 ```{r plot mortality, fig.height=6, fig.width=8}
-fit <- survfit(Surv(time, status) ~ infected, data = dat)
+fit <- survival::survfit(Surv(time, status) ~ infected, data = dat)
 #ggsurvplot(fit, data=dat)
 saved_theme <- theme_minimal() + theme(axis.text = element_text(size = 10))
 logrank.plot <- ggsurvplot(
@@ -166,6 +166,18 @@ round(prop.table(table(dat$infected, dat$organ_1_single), margin=1), 2)
 ```{r GORD}
 fisher.test(dat$infected, dat$gord_yes_1)
 round(prop.table(table(dat$infected, dat$gord_yes_1), margin=1), 2)
+```
+
+#### CLAD
+```{r GORD}
+fisher.test(dat$infected, dat$CLAD_yes_1)
+round(prop.table(table(dat$infected, dat$CLAD_yes_1), margin=1), 2)
+```
+
+#### Airway injury
+```{r GORD}
+fisher.test(dat$infected, dat$airway.injury)
+round(prop.table(table(dat$infected, dat$airway.injury), margin=1), 2)
 ```
 
 #### Immunosuppressed
