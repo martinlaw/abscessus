@@ -85,3 +85,4 @@ dat$infected.114 <- dat$infected=="Infected" & dat$infect.day < 114
 landmark <- coxph(Surv(time, status) ~ infected.114, data = dat, subset=index.114d)
 summary(landmark)
 
+

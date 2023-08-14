@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+
 ## Background
  
 This is a study comparing the mortality of transplant patients: those who were infected with Mycobacterium abscessus vs those who were not infected. To me, this suggests a retrospective cohort study: Patients were either exposed or unexposed (to the infection), then either did or did not experience a binary outcome (death). The resulting 2x2 table includes a cell containing only 2 patients, so I used Fisher's exact test. I hadn't realised that I would be given survival time as part of the data. I became concerned that I was throwing information away, so I then did some standard survival analysis, including a log rank test due to uncertainty over the PH assumption. This seemed sensible to me.
@@ -169,13 +171,13 @@ round(prop.table(table(dat$infected, dat$gord_yes_1), margin=1), 2)
 ```
 
 #### CLAD
-```{r GORD}
+```{r CLAD}
 fisher.test(dat$infected, dat$CLAD_yes_1)
 round(prop.table(table(dat$infected, dat$CLAD_yes_1), margin=1), 2)
 ```
 
 #### Airway injury
-```{r GORD}
+```{r airway}
 fisher.test(dat$infected, dat$airway.injury)
 round(prop.table(table(dat$infected, dat$airway.injury), margin=1), 2)
 ```
@@ -223,6 +225,27 @@ cor.test(sort(dat$stop[dat$event==1]),sresid,method = "pearson")
 
 cor.test(km,sresid,method = "pearson")$p.value
 ```
+
+## Reviewer comments on revision 1 
+
+**Please add more information regarding the survival analysis:**
+
+**which covariates were used**
+
+No covariates were used, given the small sample size and small number of events.
+
+**how model was built**
+
+Model was fitted in R, using the survival pacakge [cite, cite]. The code used is available on github [cite].
+
+**comment on how robust it is (given that there were only 9 patients in one group).**
+
+Landmark analysis conducted with cut off at 114 days (to minimise imbalance of group sizes): agrees with time-dependent covariate analysis (no evidence of difference in groups).
+
+Comment on proportional hazards assumption. In KM plot, survival curves cross, which indicates a violation of PH, though the data are sparse (with just 9 participants in one group).
+
+Examine Schoenfeld residuals?
+
 
 
 
