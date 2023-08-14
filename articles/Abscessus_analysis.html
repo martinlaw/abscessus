@@ -119,6 +119,13 @@ really appreciate an opinion on this before I go ahead.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DesiQuintans/librarian" class="external-link">librarian</a></span><span class="op">)</span></span>
 <span><span class="fu">librarian</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/librarian/man/shelf.html" class="external-link">shelf</a></span><span class="op">(</span><span class="va">survival</span>, <span class="va">survminer</span>,<span class="va">martinlaw</span><span class="op">/</span><span class="va">abscessus</span>, <span class="va">ggplot2</span>, quiet<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   These packages will be installed:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   'survminer', 'ggplot2'</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   It may take some time.</span></span>
+<span><span class="co">#&gt; also installing the dependencies 'crayon', 'diffobj', 'rematch2', 'pkgload', 'praise', 'waldo', 'Matrix', 'testthat', 'numDeriv', 'SparseM', 'MatrixModels', 'minqa', 'nloptr', 'RcppEigen', 'carData', 'abind', 'pbkrtest', 'quantreg', 'lme4', 'commonmark', 'Rcpp', 'corrplot', 'car', 'colorspace', 'markdown', 'png', 'jpeg', 'ggrepel', 'ggsci', 'cowplot', 'ggsignif', 'polynom', 'rstatix', 'exactRankTests', 'mvtnorm', 'farver', 'labeling', 'munsell', 'RColorBrewer', 'viridisLite', 'backports', 'generics', 'tidyselect', 'cpp11', 'KMsurv', 'data.table', 'zoo', 'km.ci', 'xtable', 'gridtext', 'ggpubr', 'gridExtra', 'maxstat', 'scales', 'broom', 'dplyr', 'tidyr', 'survMisc', 'ggtext', 'gtable', 'isoband'</span></span>
 <span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"../data/abscessus_data.csv"</span><span class="op">)</span></span>
 <span></span>
@@ -169,7 +176,7 @@ Fisher’s Exact Test:</p>
 <h4 id="plot">Plot<a class="anchor" aria-label="anchor" href="#plot"></a>
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">survfit</span><span class="op">(</span><span class="fu">Surv</span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">infected</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">survival</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/survfit.html" class="external-link">survfit</a></span><span class="op">(</span><span class="fu">Surv</span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">infected</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="co">#ggsurvplot(fit, data=dat)</span></span>
 <span><span class="va">saved_theme</span> <span class="op">&lt;-</span> <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">theme</span><span class="op">(</span>axis.text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">logrank.plot</span> <span class="op">&lt;-</span> <span class="fu">ggsurvplot</span><span class="op">(</span></span>
@@ -411,9 +418,53 @@ Exact Test for categorical variables (due to the small group size)</p>
 <span><span class="co">#&gt;   Not infected 0.58 0.42</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="immunosuppressed">Immunosuppressed<a class="anchor" aria-label="anchor" href="#immunosuppressed"></a>
+<h4 id="clad">CLAD<a class="anchor" aria-label="anchor" href="#clad"></a>
 </h4>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">CLAD_yes_1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$CLAD_yes_1</span></span>
+<span><span class="co">#&gt; p-value = 0.6541</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  0.1116612 8.0831793</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;  0.7181202</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">CLAD_yes_1</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                   0    1</span></span>
+<span><span class="co">#&gt;   Infected     0.78 0.22</span></span>
+<span><span class="co">#&gt;   Not infected 0.83 0.17</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="airway-injury">Airway injury<a class="anchor" aria-label="anchor" href="#airway-injury"></a>
+</h4>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">airway.injury</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  dat$infected and dat$airway.injury</span></span>
+<span><span class="co">#&gt; p-value = 0.1898</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true odds ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;   0.3739068 15.9388804</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; odds ratio </span></span>
+<span><span class="co">#&gt;   2.725754</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">airway.injury</span><span class="op">)</span>, margin<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               </span></span>
+<span><span class="co">#&gt;                Injury No Injury</span></span>
+<span><span class="co">#&gt;   Infected       0.33      0.67</span></span>
+<span><span class="co">#&gt;   Not infected   0.15      0.85</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="immunosuppressed">Immunosuppressed<a class="anchor" aria-label="anchor" href="#immunosuppressed"></a>
+</h4>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">immunosuppressed_pre_yes_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
@@ -435,7 +486,7 @@ Exact Test for categorical variables (due to the small group size)</p>
 <div class="section level4">
 <h4 id="pgd">PGD<a class="anchor" aria-label="anchor" href="#pgd"></a>
 </h4>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">infected</span>, <span class="va">dat</span><span class="op">$</span><span class="va">PGD_yes_1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Fisher's Exact Test for Count Data</span></span>
@@ -474,6 +525,27 @@ Exact Test for categorical variables (due to the small group size)</p>
 <span><span class="co">#&gt;   Not infected 0.83 0.17</span></span></code></pre></div>
 </div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="reviewer-comments-on-revision-1">Reviewer comments on revision 1<a class="anchor" aria-label="anchor" href="#reviewer-comments-on-revision-1"></a>
+</h2>
+<p><strong>Please add more information regarding the survival
+analysis:</strong></p>
+<p><strong>which covariates were used</strong></p>
+<p>No covariates were used, given the small sample size and small number
+of events.</p>
+<p><strong>how model was built</strong></p>
+<p>Model was fitted in R, using the survival pacakge [cite, cite]. The
+code used is available on github [cite].</p>
+<p><strong>comment on how robust it is (given that there were only 9
+patients in one group).</strong></p>
+<p>Landmark analysis conducted with cut off at 114 days (to minimise
+imbalance of group sizes): agrees with time-dependent covariate analysis
+(no evidence of difference in groups).</p>
+<p>Comment on proportional hazards assumption. In KM plot, survival
+curves cross, which indicates a violation of PH, though the data are
+sparse (with just 9 participants in one group).</p>
+<p>Examine Schoenfeld residuals?</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
