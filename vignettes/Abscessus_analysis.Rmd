@@ -14,11 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+
 ## Background
- 
+
 This is a study comparing the mortality of transplant patients: those who were infected with Mycobacterium abscessus vs those who were not infected. To me, this suggests a retrospective cohort study: Patients were either exposed or unexposed (to the infection), then either did or did not experience a binary outcome (death). The resulting 2x2 table includes a cell containing only 2 patients, so I used Fisher's exact test. I hadn't realised that I would be given survival time as part of the data. I became concerned that I was throwing information away, so I then did some standard survival analysis, including a log rank test due to uncertainty over the PH assumption. This seemed sensible to me.
 
-The paper has been reviewed and the decision is that the statistical analysis is _flawed_! There is immortal time bias, because the exposure (infection) covariate is time-varying and not fixed. Any revision will be _rejected_ unless a landmark analysis is implemented. I accept this criticism, though I also would defend my original analysis using Fisher's exact test, as I think this is not biased. 
+The paper has been reviewed and the decision is that the statistical analysis is _flawed_! There is immortal time bias, because the exposure (infection) covariate is time-varying and not fixed. Any revision will be _rejected_ unless a landmark analysis is implemented. I accept this criticism, though I also would defend my original analysis using Fisher's exact test, as I think this is not biased.
 
 I have never done a landmark analysis (thanks for your survival analysis book, Dom!). My understanding is that to do a landmark analysis, I need to choose a cut-off point. At this cut-off point, (1) all data before the cut-off is discarded, and (2) each patients' infection status is not allowed to change. That is, any patient that is uninfected at the cut-off point must be treated as uninfected in the analysis, regardless of what happens to them.
 
@@ -59,21 +61,21 @@ con
 Treating survival as binary: No difference between groups when using Fisher's Exact Test:
 
 ```{r}
-fisher.test(con) 
+fisher.test(con)
 ```
 
 ### Survival analysis
 #### Plot
 ```{r plot mortality, fig.height=6, fig.width=8}
-fit <- survfit(Surv(time, status) ~ infected, data = dat)
+fit <- survival::survfit(Surv(time, status) ~ infected, data = dat)
 #ggsurvplot(fit, data=dat)
 saved_theme <- theme_minimal() + theme(axis.text = element_text(size = 10))
 logrank.plot <- ggsurvplot(
    fit,                     # survfit object with calculated statistics.
-   data = dat,              # data used to fit survival curves. 
+   data = dat,              # data used to fit survival curves.
    risk.table = TRUE,       # show risk table.
    pval = TRUE,             # show p-value of log-rank test.
-   conf.int = FALSE,         # show confidence intervals for 
+   conf.int = FALSE,         # show confidence intervals for
                             # point estimates of survival curves.
    #xlim = c(0,2000),        # present narrower X axis, but not affect
                             # survival estimates.
@@ -168,6 +170,18 @@ fisher.test(dat$infected, dat$gord_yes_1)
 round(prop.table(table(dat$infected, dat$gord_yes_1), margin=1), 2)
 ```
 
+#### CLAD
+```{r CLAD}
+fisher.test(dat$infected, dat$CLAD_yes_1)
+round(prop.table(table(dat$infected, dat$CLAD_yes_1), margin=1), 2)
+```
+
+#### Airway injury
+```{r airway}
+fisher.test(dat$infected, dat$airway.injury)
+round(prop.table(table(dat$infected, dat$airway.injury), margin=1), 2)
+```
+
 #### Immunosuppressed
 ```{r immuno}
 fisher.test(dat$infected, dat$immunosuppressed_pre_yes_1)
@@ -212,6 +226,23 @@ cor.test(sort(dat$stop[dat$event==1]),sresid,method = "pearson")
 cor.test(km,sresid,method = "pearson")$p.value
 ```
 
+## Reviewer comments on revision 1
 
+**Please add more information regarding the survival analysis:**
 
+**which covariates were used**
+
+No covariates were used, given the small sample size and small number of events.
+
+**how model was built**
+
+Model was fitted in R, using the survival pacakge [cite, cite]. The code used is available on github [cite].
+
+**comment on how robust it is (given that there were only 9 patients in one group).**
+
+Landmark analysis conducted with cut off at 114 days (to minimise imbalance of group sizes): agrees with time-dependent covariate analysis (no evidence of difference in groups).
+
+Comment on proportional hazards assumption. In KM plot, survival curves cross, which indicates a violation of PH, though the data are sparse (with just 9 participants in one group).
+
+Examine Schoenfeld residuals?
 
